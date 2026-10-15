@@ -73,7 +73,7 @@
 | `order` | Baskets, meal sets, orders, legs, state machine, pricing, fees, tax | catalog, payments, liaison, dispatch |
 | `liaison` | Merchant channels (WhatsApp, SMS, voice, POS, partner app), templates, reply parsing | ai |
 | `payments` | PaymentIntents, Issuing cards, Connect transfers, refunds, ledger | Stripe |
-| `dispatch` | Quotes, provider selection, synchronized legs, concierge runs, tracking | Nash, DaaS, geo |
+| `dispatch` | Quotes, provider selection, cluster runs, synchronized legs, tracking | Nash, DaaS, geo |
 | `notifications` | Push (APNs/FCM/web push), email, in-app | — |
 | `ops` | Support tooling, overrides, incident flags, audit | all |
 
@@ -103,7 +103,7 @@ client ──POST /v1/sessions/:id/messages──▶ api ──▶ conversation.
 basket accepted → AvailabilityCheck workflow (fan-out per leg, timers, escalation)
   → all legs available → user pays (PaymentIntent authorize)
   → OrderSaga: firm-confirm legs → pay merchants (Connect / single-use virtual card)
-  → DispatchRun: synchronized legs or concierge run → tracking events
+  → DispatchRun: cluster run, single/co-located DaaS leg, or synchronized legs → tracking events
   → delivered → capture → payouts → feedback prompt
 compensations: void auth, cancel legs, refund, re-dispatch
 ```
@@ -119,7 +119,7 @@ Details: [WF/01 Order lifecycle](../02-workflows/01-order-lifecycle.md).
 | **Time** | Store UTC (`timestamptz`); every place and restaurant carries an IANA time zone; "ready by" times computed in merchant TZ |
 | **Money** | Integer minor units + ISO 4217 currency; never floats; double-entry ledger table for every money movement |
 | **Observability** | OpenTelemetry traces across API → Temporal → providers → Claude; Sentry errors; per-session AI cost |
-| **Feature flags** | Per user/household/metro flags (e.g., `concierge_runs`, `natural_medicine_lens`, `voice_handsfree`) |
+| **Feature flags** | Per user/household/metro flags (e.g., `cluster_runs`, `natural_medicine_lens`, `voice_handsfree`) |
 | **Config by metro** | Service areas, fees, tax rules, enabled providers, languages, cultural packs |
 | **Security & privacy** | See [06 Security, privacy & compliance](06-security-privacy-compliance.md) |
 
@@ -139,4 +139,4 @@ Details: [WF/01 Order lifecycle](../02-workflows/01-order-lifecycle.md).
 
 1. **Phase 1:** modular monolith + Temporal workers + voice gateway; one region.
 2. **Phase 2:** split `catalog` ingestion workers and `liaison` (high webhook volume) as separate deployables.
-3. **Phase 3:** second region (Canada), own-fleet dispatch, read replicas, dedicated search (Typesense/OpenSearch) if FTS+pgvector p95 > 150 ms.
+3. **Phase 3:** second region (Canada), scaled own-fleet dispatch, read replicas, dedicated search (Typesense/OpenSearch) if FTS+pgvector p95 > 150 ms.

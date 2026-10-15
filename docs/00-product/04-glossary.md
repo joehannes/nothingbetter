@@ -24,7 +24,12 @@
 | **Restaurant liaison** | The automated agent that talks to merchants over WhatsApp, SMS, voice, POS. |
 | **DaaS** | Delivery-as-a-service (DoorDash Drive, Uber Direct, via Nash). |
 | **Synchronized legs** | Several DaaS deliveries timed to arrive together. |
-| **Concierge run** | One courier from our own/partner pool doing multiple pickups and shop stops. |
+| **Cluster run** | One courier from our own/partner crew collecting from several nearby kitchens (and shops), paying at each counter with a capped run card. |
+| **Kitchen cluster** | Kitchens within ~1 km of the first pickup whose extra stops add ≤ 8 min; co-located kitchens count as one stop. |
+| **Run card** | Stripe Issuing card for one cluster run, capped per purchase, card-present only. |
+| **Co-located pickup** | Several kitchens at one address (food hall, plaza, multi-brand kitchen) handing over one consolidated bag. |
+| **Neighborhood Scout** | Background AI workflow that finds restaurants around a delivery place (open data + Google Places at request time) and drafts menus from their own websites. |
+| **Draft menu** | Menu from a restaurant's website/WhatsApp/Google profile, not yet confirmed by the kitchen; orders confirm items and prices first. |
 | **Shop extras** | Items bought at shops along the route (drinks, dessert, flowers, essentials). |
 | **Detour budget** | Max minutes a shop stop may add to the route. |
 | **Thermal class** | hot / cold / frozen / ambient — drives pickup order. |

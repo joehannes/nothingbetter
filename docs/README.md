@@ -1,6 +1,6 @@
 # NothingBetter — Documentation Index
 
-> Status: Draft v1 · 2026-10-15 · The plan for a Tauri 2 + React food-concierge platform (desktop, mobile, web) with AI-led, socially intelligent ordering from several restaurants and one coordinated delivery.
+> Status: Draft v2 · 2026-10-15 (rev 2: cluster runs, WhatsApp ordering, marketplace data, restaurant discovery) · The plan for a Tauri 2 + React food-concierge platform (desktop, mobile, web) with AI-led, socially intelligent ordering from several restaurants and one coordinated delivery.
 
 ## Reading order
 
@@ -17,7 +17,7 @@
    - [05 API & events](01-architecture/05-api-and-events.md)
    - [06 Security, privacy & compliance](01-architecture/06-security-privacy-compliance.md)
    - [07 Infrastructure & ops](01-architecture/07-infrastructure-and-ops.md)
-   - [ADRs](01-architecture/adr/) — 0001 Tauri+React · 0002 Postgres · 0003 Modular monolith + Temporal · 0004 Claude · 0005 Delivery orchestration · 0006 Merchant of record · 0007 Multi-channel liaison · 0008 Check-then-pay · 0009 Voice pipeline · 0010 No sensitive inference
+   - [ADRs](01-architecture/adr/) — 0001 Tauri+React · 0002 Postgres · 0003 Modular monolith + Temporal · 0004 Claude · 0005 Delivery orchestration · 0006 Merchant of record · 0007 Multi-channel liaison · 0008 Check-then-pay · 0009 Voice pipeline · 0010 No sensitive inference · 0011 Marketplace data collection (proposed)
 3. **Workflows** — how an order moves
    - [01 Order lifecycle](02-workflows/01-order-lifecycle.md)
    - [02 Availability & confirmation (WhatsApp automation)](02-workflows/02-availability-confirmation-whatsapp.md)
@@ -26,6 +26,7 @@
    - [05 Location, GPS & addresses](02-workflows/05-location-gps-and-addresses.md)
    - [06 Merchant onboarding & partner console](02-workflows/06-merchant-onboarding-and-partner-console.md)
    - [07 Support, refunds & exceptions](02-workflows/07-support-refunds-and-exceptions.md)
+   - [08 Courier operations (cluster runs)](02-workflows/08-courier-operations.md)
 4. **AI** — the brain
    - [01 AI platform architecture](03-ai/01-ai-platform-architecture.md)
    - [02 AI faculties & skillsets](03-ai/02-ai-faculties-skillsets.md)
@@ -38,6 +39,7 @@
    - [09 Safety & health guardrails](03-ai/09-safety-and-health-guardrails.md)
    - [10 Prompts, rulesets & templates](03-ai/10-prompts-rulesets-and-templates.md)
    - [11 Evaluation & quality](03-ai/11-evaluation-and-quality.md)
+   - [12 Restaurant discovery & data sourcing (Neighborhood Scout)](03-ai/12-restaurant-discovery-and-data-sourcing.md)
 5. **Design** — how it looks, sounds and feels
    - [01 Principles & brand](04-design/01-design-principles-and-brand.md)
    - [02 Design system](04-design/02-design-system.md)
@@ -69,6 +71,9 @@ Seed knowledge, rulesets and prompts: [`/knowledge`](../knowledge/README.md).
 | Cultural & health knowledge DB | `03-ai/06`, `knowledge/cultures`, `knowledge/natural-medicine`, `knowledge/calendar` |
 | GPS integration | `02-workflows/05` |
 | Payments, delivery-service integration (DoorDash etc.) | `02-workflows/04`, `02-workflows/03`, `00-product/02` |
+| One courier, several kitchens, courier pays (cluster runs) | `02-workflows/03`, `02-workflows/08`, ADR-0005/0006 |
+| Restaurant DB from Google Maps/open data, AI research per client | `03-ai/12`, ADR-0011 |
+| Marketplace (Uber Eats/PedidosYa) data | `00-product/02` §3.2, ADR-0011 |
 
 ## Conventions
 

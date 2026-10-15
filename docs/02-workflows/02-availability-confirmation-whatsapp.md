@@ -1,6 +1,6 @@
 # WF/02 · Merchant Availability & Confirmation (WhatsApp automation)
 
-> Status: Draft v1 · Decision: [ADR-0007](../01-architecture/adr/ADR-0007-multichannel-merchant-liaison.md) · Policy facts verified 2026-10-15 ([research §4](../00-product/02-research-and-partner-landscape.md#4-messaging-whatsapp-sms-voice))
+> Status: Draft v2 (revised 2026-10-15: WhatsApp ordering templates confirmed by founder; opt-in capture; courier-pays template) · Decision: [ADR-0007](../01-architecture/adr/ADR-0007-multichannel-merchant-liaison.md) · Policy facts verified 2026-10-15 ([research §4](../00-product/02-research-and-partner-landscape.md#4-messaging-whatsapp-sms-voice))
 
 ## 1. Goal
 
@@ -23,11 +23,25 @@ Each merchant has an ordered `merchant_channels` list with quiet hours and opt-i
 
 - **WhatsApp Business Platform (Cloud API)** with a verified business, display name "NothingBetter Orders", one number per metro (local area code).
 - Use Meta directly or a BSP (Twilio) — choose by ops tooling; adapter interface is the same.
-- **Opt-in** captured during onboarding (partner console checkbox with policy text, or reply "YES" to an SMS invite); store timestamp, method, text version.
+- **Opt-in** captured during onboarding before any template is sent (see §3a); store timestamp, method, text version. Numbers found on websites, listings or marketplaces are **not** opt-in.
 - **Template category:** *utility* (order-related). Templates in EN and ES (FR in Canada).
 - **24-hour window:** the first check to a merchant uses a template; once the merchant replies, follow-ups in the next 24 h are free-form/interactive (free). Utility templates sent inside an open window are free; outside, billed per delivered template.
 - **Escalation path:** every automated thread offers "Call NothingBetter" / human transfer (policy requirement).
 - **Scope:** business-specific order workflow only (allowed under Meta's 2026 policy that bans general-purpose AI assistants on the Business API).
+
+## 3a. Opt-in capture (how a kitchen gets onto WhatsApp ordering)
+
+| Method | Flow | Evidence stored |
+|---|---|---|
+| **Inbound-first** (preferred) | Ops calls/visits → sends or shows a `wa.me/<our-number>?text=JOIN%20NB-<code>` link or QR → kitchen sends "JOIN" | The inbound message (timestamp, number, code) — also opens a free 24-h window for onboarding questions |
+| Partner console | Checkbox "Send me order requests on WhatsApp at +1…" with policy text and version | Checkbox event, IP, user, text version |
+| Paper/tablet at field visit | Signed onboarding form; ops enters it in console | Scan + console record |
+
+Cold outreach by WhatsApp template to numbers from websites, Google listings or marketplaces is not allowed (WhatsApp policy) — first contact happens by phone, visit or email.
+
+## 3b. Ordering by template (the founder's flow)
+
+The availability check **is** the pickup order request and the firm confirmation **is** the order; for cluster runs a third template tells the kitchen that our courier pays at the counter. Sequence: `availability_check_v1` → (customer pays) → `firm_confirmation_v1` or `courier_paid_pickup_v1` → `ready_ping_v1` → courier arrives.
 
 ## 4. Templates (drafts)
 
@@ -53,6 +67,17 @@ body_en: >
   Confirmed ✅ Order {{1}} — {{2}}. Please have it ready by {{3}} for courier pickup ({{4}}).
   {{5}}            # allergy line, e.g. "⚠️ SEVERE SESAME ALLERGY: Mia's kids pasta — no sesame, clean utensils."
   Payment: {{6}}   # "Paid via NothingBetter account" | "Card call from NothingBetter within 5 min"
+buttons:
+  - { type: QUICK_REPLY, text: "👍 Got it" }
+  - { type: QUICK_REPLY, text: "Problem" }
+```
+
+```yaml
+name: courier_paid_pickup_v1
+category: UTILITY
+body_en: >
+  Confirmed ✅ Order {{1}} — {{2}}. Ready by {{3}} please.
+  Our courier {{4}} will pay {{5}} at your counter by card. {{6}}
 buttons:
   - { type: QUICK_REPLY, text: "👍 Got it" }
   - { type: QUICK_REPLY, text: "Problem" }

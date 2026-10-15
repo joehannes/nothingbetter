@@ -14,7 +14,7 @@
 - [ ] Anthropic API organization, rate limits, data-retention settings
 
 ## Legal & policy ⚖️
-- [ ] Terms of service (customers), merchant terms, courier terms (Phase 3)
+- [ ] Terms of service (customers), merchant terms, courier company contract / courier terms (cluster-run pilot)
 - [ ] Privacy policy + consumer health data privacy policy
 - [ ] Health & natural-medicine disclaimer copy reviewed
 - [ ] Allergen policy + merchant declarations flow

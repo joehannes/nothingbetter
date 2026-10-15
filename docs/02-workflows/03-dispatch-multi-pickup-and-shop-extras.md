@@ -1,104 +1,134 @@
 # WF/03 · Dispatch, Multi-Pickup & Shop Extras
 
-> Status: Draft v1 · Decision: [ADR-0005](../01-architecture/adr/ADR-0005-delivery-orchestration.md) · Provider facts: [research §2](../00-product/02-research-and-partner-landscape.md#2-delivery-as-a-service-daas-options)
+> Status: Draft v2 · Revised 2026-10-15 · Decision: [ADR-0005](../01-architecture/adr/ADR-0005-delivery-orchestration.md) · Provider research: [§2](../00-product/02-research-and-partner-landscape.md#2-delivery) · Crew operations: [WF/08](08-courier-operations.md)
 
 ## 1. Dispatch modes
 
 | Mode | When | How | Customer sees |
 |---|---|---|---|
-| **single** | One merchant | One DaaS delivery (via Nash or direct DoorDash Drive / Uber Direct) | One courier |
-| **synchronized_legs** | 2–3 merchants, DaaS only (Phase 2) | N deliveries, each scheduled so arrivals fall in one promise window | "2 couriers, arriving within 8 min of each other"; fees per leg |
-| **batched_job** | Provider supports multi-pickup single-drop (verify per provider) | One provider job with multiple pickups | One courier |
-| **concierge_run** | Launch zone with own/partner pool (Phase 3) | One courier, ordered stops (pickups + shop extras), capped Issuing card | One courier, route with stops |
+| **cluster_run** (primary for 2+ kitchens) | Kitchens satisfy the cluster rule (§2) and a crew courier is available | One courier from our own/partner crew; ordered pickups; pays at each counter with a capped run card; optional shop stops | "1 courier · 3 stops · 7:20–7:30" |
+| **single** | One kitchen | One DaaS delivery (DoorDash Drive / Uber Direct, via Nash or direct) | "1 courier" |
+| **co_located** | Food hall / plaza / multi-brand kitchen with consolidated bag | One DaaS delivery from the shared address | "1 courier" |
+| **synchronized_legs** (fallback) | No crew courier available or outside crew hours | N DaaS deliveries scheduled to land in one 10-minute window | "2 couriers, arriving within 8 min of each other" + per-leg fees |
+| **batched_job** (if offered later) | A provider enables multi-pickup on its API (BD ask to DoorDash/Uber) | One provider job with multiple pickups | "1 courier" |
 
-The Logistics Planner quotes all feasible modes and the Host presents the trade-off ("One courier: $11.90, ~45 min. Two couriers: $17.50, ~38 min.").
+The Logistics Planner quotes all feasible modes and the Host presents the trade-off only when it matters ("One courier: $11.90, ~42 min. Two couriers: $17.50, ~36 min.").
 
-## 2. `DeliveryProvider` interface
+## 2. Kitchen-cluster rule
+
+Applied by the meal-set composer (hard constraint for multi-kitchen sets):
+
+```yaml
+# metro config: dispatch.cluster
+cluster:
+  max_pair_distance_m: 1000        # every kitchen within ~1 km (0.6 mi) of the first pickup
+  max_extra_minutes: 8             # extra route time added by additional pickups
+  max_kitchens: 3                  # Phase 1 pilot
+  max_customer_distance_mi: 5      # keeps DaaS base rate if we fall back to separate legs
+  co_located_counts_as_one: true   # food halls, plazas, multi-brand kitchens
+shop_extras:
+  max_detour_minutes_each: 6
+  max_detour_minutes_total: 12
+```
+
+Distance surcharges (e.g., DoorDash Drive +$0.75/mi beyond 5 mi up to 15 mi) pay for a longer single leg — they don't buy extra pickups. The cluster rule is what keeps multi-kitchen cost and food quality under control.
+
+## 3. Mode selection (dispatch strategy)
+
+```text
+input: meal set (legs with merchant locations, ready_by, thermal classes), customer place, desired window
+feasible = []
+if legs == 1:
+    feasible += single (DaaS quotes)            + cluster_run (if crew idle nearby and cheaper)
+if legs >= 2 and cluster_rule_ok(legs):
+    feasible += cluster_run (crew availability & ETA from dispatch tool)
+    if all legs co-located:      feasible += co_located
+    feasible += synchronized_legs (DaaS quotes per leg)
+cost(mode)  = courier_cost + card_fees + expected_wait_cost
+score(mode) = w_cost·cost + w_eta·eta + w_quality·travel_penalty + w_reliability·(1−reliability)
+choose min score; failover order: cluster_run → synchronized_legs → single legs re-timed
+```
+
+`courier_cost` for a cluster run = estimated run minutes × crew cost per minute (contract or hourly), + mileage if applicable. Crew utilization is tracked so the estimate reflects reality (a courier idle anyway is nearly free; a courier pulled from another run is not).
+
+## 4. Cluster runs (Phase 1 pilot)
+
+### 4.1 Route planning
+
+```text
+stops = restaurant pickups (+ shop stops)
+order: ambient/cold first, shop stops before hot pickups, hot food last, frozen near the end (insulated bag)
+each pickup ≥ its ready_by − 3 min
+objective: minimize time from first hot pickup to door (target ≤ 25 min) subject to max run time (≤ 45 min)
+```
+
+Small TSP-with-time-windows heuristic (≤ 6 stops) in `packages/domain/routing.ts` using a Mapbox Matrix. Kitchens receive `ready_by` times matched to the sequence (WF/02).
+
+### 4.2 Dispatch tooling
+
+| Tool | Use |
+|---|---|
+| **Onfleet** (preferred) | Linked tasks: pickup tasks in order + one dropoff, same driver; driver app with photo proof, barcode, signatures; webhooks |
+| Shipday (alternative) | Multi-depot pickups, route planning, driver app; DaaS fallback built in |
+| Nash own-fleet routes (alternative) | If Nash is also our DaaS orchestrator |
+
+Adapter: `DeliveryProvider` id `own_fleet` with sub-adapter `onfleet | shipday | nash_fleet`.
+
+### 4.3 Paying at the counter
+
+- Courier carries a **run card** (Stripe Issuing; virtual card in Apple/Google Wallet or a physical card), limits per [WF/04](04-payments-and-money-flow.md#4-paying-merchants).
+- Kitchen was told by WhatsApp "Our courier pays at the counter" (template `courier_paid_pickup_v1`) with the exact total.
+- Real-time authorization approves only if the merchant matches an open leg of the run (MCC + name/location heuristics) and amount ≤ leg amount × 1.10.
+- Receipt photo in the driver app; mismatch > 10 % → ops review.
+
+### 4.4 Pilot scope
+
+- One launch zone (dense restaurant cluster), dinner peak (e.g., 17:00–21:00) + weekend lunch.
+- 2–4 couriers per shift; 15–25 partner kitchens inside the zone.
+- Outside crew hours: single/synchronized DaaS legs.
+- Success = cost per run ≤ equivalent DaaS legs for ≥ 60 % of multi-kitchen orders, on-time ≥ 90 %, receipt mismatches ≤ 2 %.
+
+## 5. `DeliveryProvider` interface
 
 ```ts
 interface DeliveryProvider {
-  id: "nash" | "doordash_drive" | "uber_direct" | "own_fleet";
-  capabilities(): Promise<{ multiPickup: boolean; scheduled: boolean; alcohol: boolean;
-                            maxDistanceMi?: number; regions: string[] }>;
-  quote(req: QuoteRequest): Promise<Quote[]>;           // fee, pickup/dropoff ETAs, expiry
+  id: "own_fleet" | "nash" | "doordash_drive" | "uber_direct";
+  capabilities(): Promise<{ multiPickup: boolean; courierPays: boolean; scheduled: boolean;
+                            alcohol: boolean; maxDistanceMi?: number; regions: string[] }>;
+  quote(req: QuoteRequest): Promise<Quote[]>;           // fee or cost estimate, pickup/dropoff ETAs, expiry
   create(req: CreateDeliveryRequest): Promise<DeliveryRef>;
   cancel(ref: DeliveryRef, reason: string): Promise<CancelResult>;
   get(ref: DeliveryRef): Promise<DeliveryStatus>;
-  // webhooks normalized to DeliveryEvent: assigned, at_pickup, picked_up, en_route, at_dropoff, delivered, failed, cancelled, eta_changed
+  // webhooks normalized to DeliveryEvent: assigned, at_pickup(stop), picked_up(stop), purchase_made(stop),
+  // en_route, at_dropoff, delivered, failed, cancelled, eta_changed
 }
 
 type CreateDeliveryRequest = {
-  externalId: string;                       // leg or run id (idempotency)
-  pickups: Stop[];                          // 1 for DaaS single; N for batched/concierge
+  externalId: string;                       // run or leg id (idempotency)
+  pickups: (Stop & { readyBy: string; payAtCounter?: { amountMinor: number; currency: "USD" | "CAD" } })[];
+  shopStops?: (Stop & { shoppingList: ShoppingItem[]; capMinor: number })[];
   dropoff: Stop & { instructions?: string; contactless?: boolean; verification?: "photo" | "pin" };
-  pickupWindow?: { start: string; end: string };
   dropoffWindow?: { start: string; end: string };
   orderValueMinor: number; currency: "USD" | "CAD";
-  items: { name: string; quantity: number; thermalClass?: ThermalClass }[];
+  items: { name: string; quantity: number; thermalClass?: ThermalClass; stopRef: string }[];
   tipMinor?: number;
 };
 ```
 
-## 3. Provider selection (dispatch strategy)
+DaaS adapters reject `pickups.length > 1` and `payAtCounter` (capabilities false) so the dispatcher never sends unsupported jobs.
 
-```text
-for each feasible mode:
-   quotes = parallel provider.quote()  (timeout 3 s, cache 2 min)
-   score  = w_fee·fee + w_eta·eta + w_rel·(1−reliability) + w_quality·travelPenalty + w_legs·legs
-choose min score subject to: promise window feasible, provider in region, item restrictions (no alcohol v1)
-failover: on cancel/no-assign after T (e.g., 6 min) → next provider (Nash strategy or our own loop)
-```
+## 6. Synchronized legs (fallback)
 
-Nash adds provider aggregation, contract pricing and auto-failover across its network; direct adapters to DoorDash Drive / Uber Direct are kept as alternates (no single point of failure).
+1. Per leg: `ready_by`, provider pickup→dropoff ETA.
+2. Target arrival window `[T, T+10 min]`; schedule each leg's creation so predicted arrival ∈ window.
+3. Monitor ETAs; notify early if spread grows.
+4. One merged tracking view.
 
-## 4. Synchronized legs (Phase 2)
-
-1. Compute for each leg: `prep_done = ready_by`, `travel = provider pickup→dropoff ETA`.
-2. Target arrival window `[T, T+10 min]` (scheduled) or `[now+ETA_max, +10]` (ASAP).
-3. Schedule each leg's delivery creation (`pickupWindow`) so predicted arrival ∈ window; kitchens receive matching `ready_by`.
-4. Monitor ETAs; if spread grows beyond window, notify user early with honest update.
-5. Customer tracking merges legs into one view.
-
-Fees: each leg is a separate delivery fee (e.g., DoorDash Drive's distance-based rate per leg). The Value Analyst and Logistics Planner prefer combinations that reduce legs when the experience is equal.
-
-## 5. Concierge runs (Phase 3)
-
-### Fleet model options
-
-| Option | Pros | Cons |
-|---|---|---|
-| Partner courier company (local) via Nash/Onfleet | Fast to start, insured, experienced | Margins, fewer controls |
-| Own contractor pool (Stripe Connect payouts) | Control, brand experience | Labor-law compliance (min pay rules in some cities, classification), insurance, ops |
-| Hybrid | Flexibility | Complexity |
-
-Recommendation: start with a **partner courier company** in the launch zone dispatched through Nash/Onfleet, with our capped Issuing cards for purchases.
-
-### Route planning
-
-```text
-stops = restaurant pickups + shop stops
-order constraints: ambient/cold first, hot last; shop stops before hot pickups;
-                   frozen near end; each pickup after its ready_by − 3 min
-objective: minimize total time subject to max route time (e.g., 45 min from first hot pickup to door)
-detour budget for extras: ≤ 6 min each, ≤ 12 min total (configurable by dials/occasion)
-```
-
-Solved with a small TSP-with-time-windows heuristic (≤ 6 stops) in `packages/domain/routing.ts`, using a distance/time matrix from Mapbox Matrix API.
-
-### Courier purchases
-
-- Courier receives a **run card** (Stripe Issuing virtual card in a wallet or physical card) with:
-  - spending limit per authorization = expected leg/extra amount × 1.10,
-  - allowed categories: restaurants, fast food, grocery, convenience, florists (no liquor stores in v1),
-  - auto-expiry at run end; real-time authorization webhook checks the order context (`issuing_authorization.request`).
-- Receipt photo required per purchase in the courier app; mismatch > 10 % → ops review.
-
-## 6. Shop extras
+## 7. Shop extras
 
 ### Discovery along the route
 
 ```sql
--- shops within a corridor around the planned route polyline, open at the expected stop time
 select s.*
 from catalog.merchant_locations s
 join catalog.merchants m on m.id = s.merchant_id
@@ -107,29 +137,24 @@ where m.kind in ('shop','florist','grocery','bakery')
   and is_open(s.hours, :eta_at_stop, s.timezone);
 ```
 
-### Catalog for extras
+- Partner shops with catalogs → exact items/prices; others → category requests with caps ("seasonal bouquet ≤ $25").
+- Substitution rule per extra: same brand any size · similar item · skip · message me (2-min in-app approval, else fallback).
+- In cluster runs the courier buys with the run card; on DaaS-only orders, extras need a separate shop leg (often not worth it — the Host says so).
+- v1 restrictions: no alcohol, tobacco, vapes, cannabis, prescription/pharmacy-only items, gift cards; items > $50 need re-confirmation.
 
-- Partner shops with item catalogs (POS-integrated) → exact items/prices.
-- Non-partner shops → **category requests** with caps: "sparkling water, 2 bottles, ≤ $8", "seasonal bouquet ≤ $25", "pint of vanilla ice cream ≤ $9".
-- Substitution rule per extra: *same brand any size* · *similar item* · *skip if unavailable* · *message me* (in-app quick approve within 2 min, else rule fallback).
+## 8. Tracking
 
-### Restrictions (v1)
+- Cluster runs: driver-app location every 10–15 s while active; stop chips (🍰 picked up · 💳 paid · 🍽️ waiting · 🏠 7:28).
+- DaaS: provider tracking URL + webhooks → normalized events.
+- Proof of delivery: photo or PIN.
 
-No alcohol, tobacco, vapes, cannabis, prescription or pharmacy-only items, gift cards, or items > $50 each without user re-confirmation.
-
-## 7. Tracking
-
-- DaaS: provider tracking URL + webhook statuses → normalized events → WS to clients.
-- Concierge runs: courier app location every 10–15 s while active (through dispatch vendor's driver app initially).
-- Customer map: route polyline, stop icons, live ETA, per-leg chips ("🌮 picked up").
-- Proof of delivery: photo or PIN for gift/high-value orders.
-
-## 8. Edge cases
+## 9. Edge cases
 
 | Case | Handling |
 |---|---|
-| Food not ready at courier arrival | Courier waits up to N min (ruleset); notify merchant via liaison "ready?"; re-sequence stops in concierge run |
-| One leg's courier fails | Failover; if other legs already arriving, notify user with honest split ETA and credit |
-| Shop item unavailable | Substitution rule; refund difference automatically |
-| Address issue at dropoff | Courier chat/call via provider; customer instructions; leave at safe place only if allowed |
-| Weather/traffic spike | Wider promise windows proactively; fewer legs |
+| Food not ready at courier arrival | Courier waits up to N min (ruleset); ready ping; re-sequence remaining stops |
+| Card declined at counter | Real-time auth log shows reason; ops can raise limit within policy or switch that leg to Connect settlement/virtual card |
+| Price at counter > leg amount × 1.10 | Decline; courier calls ops; user asked if the difference exceeds tolerance |
+| Courier unavailable mid-run | Ops reassigns within crew; else DaaS legs for remaining stops |
+| Shop item unavailable | Substitution rule; refund difference |
+| Severe weather | Pause cluster runs; DaaS only; widen windows |

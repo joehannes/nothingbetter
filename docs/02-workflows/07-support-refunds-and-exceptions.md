@@ -30,7 +30,7 @@ In-app "Something wrong?" on the order page:
 | Virtual card declined | Issuing event | Check controls; issue new card; or Connect settlement |
 | Price mismatch at pickup (> tolerance) | Courier/merchant report | Approve within tolerance; otherwise ask user |
 | Address unreachable | Courier report | Call user; hold up to 5 min; return policy |
-| Severe weather | Weather alert | Pause concierge runs; widen windows; inform users |
+| Severe weather | Weather alert | Pause cluster runs; widen windows; inform users |
 
 ## 4. Learning loop
 

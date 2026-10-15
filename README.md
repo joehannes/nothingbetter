@@ -7,7 +7,9 @@ NothingBetter works out who is eating, why, and in what mood — using conversat
 - **Clients:** Tauri 2 (macOS, Windows, Linux, iOS, Android) + web, one React codebase
 - **Backend:** TypeScript (Node 24, Fastify), Temporal workflows, PostgreSQL + PostGIS + pgvector
 - **AI:** Claude (Anthropic API) — host agent + council of faculties, structured outputs, rulesets
-- **Integrations:** Stripe (Payments, Connect, Issuing, Tax), DoorDash Drive / Uber Direct (via Nash), WhatsApp Cloud API, Twilio, Mapbox, POS (Square/Toast/Clover)
+- **Delivery:** one courier collecting from several nearby kitchens and paying at each counter ("cluster runs", own/partner crew + Onfleet + Stripe Issuing run cards); DoorDash Drive / Uber Direct for single kitchens
+- **Restaurant data:** open places data (Overture, OSM) + Google Places at request time + an AI "Neighborhood Scout" reading restaurants' own menus + WhatsApp menus; every order confirmed by the kitchen before payment
+- **Integrations:** Stripe (Payments, Connect, Issuing, Tax), DoorDash Drive / Uber Direct, Onfleet, WhatsApp Cloud API, Twilio, Google Places, Mapbox, POS (Square/Toast/Clover)
 - **Launch:** one North American metro (recommended: Miami-Dade), then Toronto
 
 ## Status

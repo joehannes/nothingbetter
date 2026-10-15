@@ -1,0 +1,15 @@
+name: courier_paid_pickup_v1
+category: UTILITY
+languages: [en_US, es_US]
+body:
+  en_US: >
+    Confirmed ✅ Order {{1}} — {{2}}. Ready by {{3}} please.
+    Our courier {{4}} will pay {{5}} at your counter by card. {{6}}
+  es_US: >
+    Confirmado ✅ Pedido {{1}} — {{2}}. Por favor, téngalo listo a las {{3}}.
+    Nuestro repartidor {{4}} pagará {{5}} en su mostrador con tarjeta. {{6}}
+variables:
+  "6": "Allergy line or empty"
+buttons:
+  - { type: QUICK_REPLY, en_US: "👍 Got it", es_US: "👍 Recibido" }
+  - { type: QUICK_REPLY, en_US: "Problem", es_US: "Problema" }

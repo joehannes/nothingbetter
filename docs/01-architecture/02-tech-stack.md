@@ -55,7 +55,7 @@
 | Voice | Streaming STT (Deepgram or AssemblyAI), TTS (ElevenLabs or Cartesia); **LiveKit** (WebRTC + Agents) in Phase 2 | Vendor-neutral `SpeechProvider` interface |
 | Messaging | **WhatsApp Cloud API** (direct or via Twilio as BSP), **Twilio** SMS + Voice | `MerchantChannel` interface |
 | Payments | **Stripe** Payments, Issuing, Connect, Tax | |
-| Delivery | **Nash** (orchestrator) and/or direct **DoorDash Drive** + **Uber Direct**; **Onfleet** or Nash own-fleet for concierge runs | `DeliveryProvider` interface |
+| Delivery | **Nash** (orchestrator) and/or direct **DoorDash Drive** + **Uber Direct**; **Onfleet** (linked tasks) or Shipday / Nash own-fleet for cluster runs | `DeliveryProvider` interface |
 | Geo | **Mapbox** Search/Geocoding, Directions, Matrix | Google Places optional for discovery (license limits) |
 | POS | Square, Toast, Clover partner APIs (Phase 2) | `PosAdapter` interface |
 | Email | Postmark or Amazon SES | Receipts |

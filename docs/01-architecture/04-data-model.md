@@ -269,7 +269,7 @@ create table "order".orders (
   place_id text not null,
   status text not null,               -- see WF/01 state machine
   scheduled_for timestamptz,          -- null = ASAP
-  dispatch_mode text not null,        -- single|synchronized_legs|concierge_run
+  dispatch_mode text not null,        -- cluster_run|single|co_located|synchronized_legs
   subtotal_minor bigint not null, fees_minor bigint not null, tax_minor bigint not null,
   tip_minor bigint not null default 0, extras_cap_minor bigint not null default 0,
   total_authorized_minor bigint, total_captured_minor bigint,
@@ -342,6 +342,38 @@ create table dispatch.dispatch_stops (
   seq smallint not null, kind text not null,   -- pickup|shop|dropoff
   leg_id text, eta timestamptz, arrived_at timestamptz, completed_at timestamptz,
   geom geography(Point,4326) not null
+);
+```
+
+### 5b. Cluster runs & data provenance (rev 2)
+
+```sql
+create table dispatch.runs (                -- one courier, several stops (cluster run)
+  id text primary key,                      -- run_
+  order_id text not null,
+  crew_provider text not null,              -- onfleet|shipday|nash_fleet
+  courier_ref text, run_card_id text references payments.issuing_cards(id),
+  status text not null,                     -- planned|assigned|in_progress|delivered|failed|cancelled
+  planned_minutes int, actual_minutes int,
+  cost_estimate_minor bigint, cost_actual_minor bigint, currency char(3)
+);
+
+create table dispatch.purchases (            -- courier pays at a counter or shop
+  id text primary key, run_id text not null, stop_id text not null,
+  issuing_authorization_id text unique, amount_minor bigint not null, currency char(3) not null,
+  receipt_url text, receipt_total_minor bigint, mismatch_flag boolean not null default false
+);
+
+alter table catalog.merchant_locations add column cluster_ids text[] default '{}';   -- precomputed kitchen clusters
+alter table catalog.merchant_locations add column co_located_group text;             -- food hall / plaza id
+
+create table catalog.merchant_sources (       -- where each merchant fact came from
+  merchant_id text not null, field text not null,     -- phone|whatsapp|hours|menu|price|website
+  source text not null,                               -- kitchen|pos|website|google_places|foursquare|overture|osm|licensed|marketplace_research
+  source_ref text, license text, fetched_at timestamptz not null,
+  trust text not null,                                -- verified|high|medium|low
+  expires_at timestamptz,                             -- e.g. Google content not cached beyond policy
+  primary key (merchant_id, field, source)
 );
 ```
 

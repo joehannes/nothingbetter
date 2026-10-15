@@ -14,10 +14,15 @@ Keep a **fresh, normalized, enriched food graph** for every active merchant — 
 | Partner console upload (PDF, photo, URL) | `UploadMenuAdapter` | On upload | On change |
 | Merchant website (permission recorded) | `WebMenuAdapter` (Playwright; robots.txt respected; optional Cloudflare Browser Run/Browserbase for scale) | Weekly + on-demand | Weekly |
 | WhatsApp catalog / menu photo sent by merchant | `ChatMenuAdapter` | On message | On change |
-| Places data (hours, location, categories) | `PlacesAdapter` (license-compliant) | Monthly | Monthly |
+| Open places data — Overture Maps places, OpenStreetMap, Foursquare OS Places | `OvertureAdapter`, `OsmAdapter` (stored, with license provenance) | Monthly per metro bbox | Monthly |
+| Google Places API (hours, open-now, price level, phone, website) | `GooglePlacesAdapter` — runtime only, place IDs stored | Per session | Live |
+| Restaurants' own websites / PDF menus found by the AI Neighborhood Scout | `WebsiteMenuAdapter` (Claude web_search + web_fetch, marketplace & Meta domains blocked) — [AI/12](12-restaurant-discovery-and-data-sourcing.md) | New delivery place + every 2–4 weeks | Draft (kitchen confirms per order) |
+| Owner-authorized Google Business Profile menus | `BusinessProfileMenuAdapter` (`getFoodMenus`, owner OAuth) | On connect + weekly | Weekly |
+| Licensed nutrition data for chains (e.g., Nutritionix) | `NutritionLicenseAdapter` | Monthly export/API | Monthly |
 | Availability signals from liaison replies | `LiaisonSignalAdapter` | Every check | Live |
+| Marketplace pages (Uber Eats, PedidosYa, DoorDash) | `MarketplaceResearchAdapter` — **disabled by default**, owner + counsel decision ([ADR-0011](../01-architecture/adr/ADR-0011-marketplace-data-collection.md)) | — | — |
 
-Marketplace consumer apps (Uber Eats, DoorDash, Grubhub, PedidosYa) are **not** sources ([research](../00-product/02-research-and-partner-landscape.md)).
+Marketplace terms prohibit commercial use/extraction of their content (Uber: "whether or not you are logged in"; PedidosYa DR: "Queda prohibido… extraer…"), both block automated clients, Uber Eats doesn't publish restaurant phone numbers, and app prices run above in-store prices ([research §3.2](../00-product/02-research-and-partner-landscape.md#32-marketplace-data-uber-eats-pedidosya-doordash--findings)). If the owner enables option C of ADR-0011, the adapter must: run logged-out, honor robots.txt, stop on any challenge/denial (no circumvention), collect only facts (restaurant name, cuisine, item names, price level), never photos or descriptions, tag records `provenance=marketplace_research, trust=low`, keep them non-orderable until the kitchen confirms its menu, and purge them after onboarding or 90 days.
 
 ## 3. Pipeline
 

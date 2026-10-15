@@ -26,7 +26,7 @@ NothingBetter starts from a **conversation and a context**: the time, the weathe
 | 1 | **It knows the table** | "It remembered Mia's sesame allergy and that Dad hates cilantro." | Avatar system + hard-constraint memory ([AI/05](../03-ai/05-memory-avatars-and-personalization.md)) |
 | 2 | **It reads the moment** | Work lunch: three options, one tap. Anniversary: a curated story-led menu. | Adaptive dials: urgency, inspiration, directness, scenic ([AI/04](../03-ai/04-conversation-engine-and-adaptive-dials.md)) |
 | 3 | **It advises like a friend with expertise** | Natural-medicine, nutrition, cultural and social insight, never preachy | Council of AI faculties + curated knowledge base ([AI/02](../03-ai/02-ai-faculties-skillsets.md), [AI/06](../03-ai/06-knowledge-base-culture-health-seasons.md)) |
-| 4 | **It mixes kitchens freely** | Tacos from one place, Thai curry from another, flowers and sparkling water from the shop on the way | Multi-leg orders + dispatch orchestration ([WF/03](../02-workflows/03-dispatch-multi-pickup-and-shop-extras.md)) |
+| 4 | **It mixes nearby kitchens** | Tacos from one place, Thai curry from the one next door, flowers and sparkling water from the shop on the way — one courier who pays at each counter | Kitchen-cluster rule + cluster runs + dispatch orchestration ([WF/03](../02-workflows/03-dispatch-multi-pickup-and-shop-extras.md)) |
 | 5 | **It confirms before you pay** | "All three kitchens said yes, ready by 7:40." | Restaurant liaison over WhatsApp, SMS, voice and POS ([WF/02](../02-workflows/02-availability-confirmation-whatsapp.md)) |
 
 ## 4. Who it is for (launch)
@@ -57,7 +57,7 @@ See [03 · Personas & journeys](03-personas-and-journeys.md).
 - Not a scraper or reseller of other marketplaces' consumer apps (see [research](02-research-and-partner-landscape.md)).
 - Not a medical service; no diagnosis, no treatment claims.
 - Not an alcohol seller in v1 (licensing and ID checks deferred to a later phase).
-- Not a courier company on day one (we orchestrate couriers; an own/partner pool comes in Phase 3).
+- Not a courier company: we orchestrate couriers — DaaS for single kitchens, and a small own/partner crew for multi-kitchen cluster runs (Phase 1 pilot in one zone).
 
 ## 7. Platforms
 

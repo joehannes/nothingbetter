@@ -46,7 +46,7 @@ Context: Saturday 17:00, calendar event "Our 5th 🥂", Jordan & Sam's avatars, 
 1. Scenic layout, warmer tone: *"Five years — want to recreate something or make it new?"* with chips **Recreate our first date · Surprise us · A tasting journey**.
 2. Jordan: *"Our first date was at a little Peruvian place that closed."*
 3. Inspiration + Cultural faculties propose a **three-stop menu**: ceviche & lomo saltado from a Peruvian kitchen, a passion-fruit tart from a pastry shop, and a florist stop for a small bouquet on the route. Each card tells a 1–2 sentence story.
-4. Logistics shows the route: 🍰 pastry (cold, first) → 💐 florist → 🍽️ Peruvian (hot, last) → 🏠. Mode: concierge run (Phase 3) or two synchronized legs (Phase 2) — the fee difference is shown.
+4. Logistics shows the route: 🍰 pastry (cold, first) → 💐 florist → 🍽️ Peruvian (hot, last) → 🏠. Mode: cluster run (one courier pays at each counter; kitchens within ~1 km) or, outside crew hours, synchronized DaaS legs — the fee difference is shown.
 5. Availability across 3 merchants (WhatsApp ✅, SMS ✅, POS ✅), then payment with authorized cap for the florist item.
 6. Delivery at the requested time window 19:30–19:45 (scheduled).
 
@@ -57,7 +57,7 @@ Context: Daniel says *"I'm getting over the flu, nothing heavy."* Health lens an
 1. Safety Sentinel checks red flags (fever > 3 days, breathing issues → suggest seeing a clinician; never diagnose).
 2. Natural Medicine faculty (traditional framing): warming, easy-to-digest foods — ginger-scallion congee, chicken soup with garlic, miso soup; evidence notes like *"Ginger is traditionally used for nausea; some studies support this."*
 3. Nutrition faculty flags sodium for his hypertension → proposes lower-sodium options and "ask for broth on the side".
-4. Shop extras: ginger tea and honey from a pharmacy/grocery on the route (Phase 3), or a separate leg.
+4. Shop extras: ginger tea and honey from a grocery on the route (cluster run), or a separate leg.
 5. Tone: gentle, short, no upsell. Follow-up next day is opt-in only.
 
 ## 6. Journey E — "Iftar for six" (cultural + timing)

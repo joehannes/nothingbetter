@@ -14,8 +14,10 @@ This repo is **docs-first**. Before writing code, read `docs/README.md`, then th
 - **The AI never moves money.** Payment, merchant payment and dispatch happen only through deterministic validators and workflows. Host tools must not include payment actions.
 - **No sensitive inference.** Never infer culture, religion, ethnicity or health from names, voice, location or orders (ADR-0010).
 - **Merchant messaging requires opt-in evidence** and respects quiet hours (WF/02).
-- **No scraping or automated ordering on marketplaces' consumer apps** (Uber Eats, DoorDash, Grubhub, PedidosYa).
+- **No automated ordering on marketplaces' consumer apps** (Uber Eats, DoorDash, Grubhub, PedidosYa). **Marketplace data collection stays off** unless the owner and counsel approve an option in ADR-0011; never circumvent bot protection; never message harvested numbers on WhatsApp.
+- **Third-party data licenses are enforced in code:** every merchant fact carries `catalog.merchant_sources` provenance; Google Maps content is not cached beyond its policy (store place IDs, refresh on demand).
 - **Health/natural-medicine wording** follows the evidence-level table in `docs/03-ai/06` §4; no disease claims.
+- **Courier money:** run cards only via `payments` module with per-authorization limits; no cash flows.
 
 ## Coding conventions
 

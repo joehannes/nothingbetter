@@ -16,7 +16,7 @@
 2. **Channels & opt-in:** WhatsApp number (recommended), SMS number, phone for calls, quiet hours; explicit opt-in checkboxes with policy text (recorded with timestamp/version).
 3. **Menu:** connect POS (Square/Toast/Clover) **or** upload PDF/photos/URL → AI parse → review screen ("What we understood") → fix items, mark sold-out items, declare labels/allergens/certifications (halal, kosher, gluten-free kitchen).
 4. **Operations:** average prep time by daypart, max concurrent pickup orders, pickup instructions (counter, side door), packaging notes.
-5. **Payments:** Connect onboarding (partner) or virtual-card acceptance method (listed): phone card entry, online ordering link, or in-person card at pickup (concierge run).
+5. **Payments:** Connect onboarding (partner) or virtual-card acceptance method (listed): phone card entry, online ordering link, or in-person card payment by our courier at pickup (cluster run).
 6. **Allergen & cross-contact policy:** short questionnaire; can they guarantee no sesame/peanut contact? (Needed to serve severe-allergy seats.)
 7. **Go live:** test order with simulator; status → active.
 

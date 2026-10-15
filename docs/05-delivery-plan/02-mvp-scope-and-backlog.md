@@ -4,8 +4,8 @@
 
 ## Scope guardrails (Phase 1)
 
-**In:** web + desktop app, EN/ES, avatars/households/memory, council, proposals & Table view, single-restaurant orders, WhatsApp + SMS checks, Stripe payments, DaaS single delivery, push-to-talk voice, partner console v0, ops console v0.
-**Out (later):** multi-restaurant orders (Phase 2), POS, mobile builds, hands-free voice, shop extras & concierge runs (Phase 3), calendar integrations, alcohol.
+**In:** web + desktop app, EN/ES, avatars/households/memory, council, proposals & Table view, single-restaurant orders via DaaS, **cluster-run pilot (2–3 nearby kitchens, one courier paying at each counter) in one zone**, WhatsApp ordering templates + SMS, Stripe payments + Issuing run cards, push-to-talk voice, partner console v0, ops console v0.
+**Out (later):** shop extras at scale, synchronized DaaS legs, POS, mobile builds, hands-free voice (Phase 2); calendar integrations, second metro (Phase 3); alcohol; marketplace data collection (ADR-0011 default off).
 
 ---
 
@@ -45,6 +45,11 @@
 | NB-M2-04 | Canonical dishes seed (≥ 600 dishes across launch-zone cuisines) + mapping | ≥ 90 % items mapped with confidence ≥ 0.7 |
 | NB-M2-05 | Enrichment (allergen risk, nutrition ranges, flavor, thermal class, travel score, tags) via Batch | Estimated fields flagged; never shown as "free of" |
 | NB-M2-06 | Hybrid search (FTS + vector + geo + open-now + constraints) | p95 ≤ 150 ms on seeded metro |
+| NB-M2-08 | Overture + OSM import per metro bbox into the directory with license provenance (`catalog.merchant_sources`); dedupe by phone/name/distance/domain | Pilot zone directory built; duplicates < 3 % on a 200-record sample |
+| NB-M2-09 | `GooglePlacesAdapter` (runtime only; place-ID storage; Google attribution/map rules) | No Google content persisted beyond place IDs (test) |
+| NB-M2-10 | Neighborhood Scout workflow (H3 cells, Places live data, Claude web_search/web_fetch with blocked domains, ParsedMenu drafts) | ≥ 50 % of zone restaurants with website get a draft menu; no marketplace/Meta fetches in logs |
+| NB-M2-11 | Outreach CRM: prospect queue by demand, call scripts (EN/ES), wa.me JOIN links, opt-in capture | Opt-in evidence stored for every WhatsApp-enabled kitchen |
+| NB-M2-12 | `BusinessProfileMenuAdapter` (owner OAuth `getFoodMenus`) | Connected kitchen's Google menu imported and reviewable |
 | NB-M2-07 | Knowledge seed: launch-zone cultural packs, occasions calendar (12 months), natural-medicine top-60 ingredients, allergen ontology | Reviewed by advisors (labels on PR) |
 
 ## M3 · Conversation & Council
@@ -75,6 +80,19 @@
 | NB-M4-09 | Capture, ledger, reconciliation job | Daily reconciliation report zero-diff on test data |
 | NB-M4-10 | Feedback per seat → preferences; Memory Curator with confirmations | "What I know" reflects new memories with provenance |
 
+## M4b · Cluster Runs (pilot)
+
+| ID | Story | AC |
+|---|---|---|
+| NB-M4b-01 | Kitchen-cluster rule in composer (metro config: max pair distance, extra minutes, max kitchens, customer distance; co-located = one stop) | 0 multi-kitchen sets violate the rule in 150 scenarios |
+| NB-M4b-02 | `own_fleet` DeliveryProvider via Onfleet linked tasks (pickups in order + dropoff, same driver); webhooks → `DeliveryEvent` incl. `purchase_made` | Simulator run with 3 pickups completes; events ordered |
+| NB-M4b-03 | Route sequencing (thermal order, ready_by windows) in `packages/domain/routing.ts` | Hot food last; first-hot-pickup→door ≤ 25 min in fixtures |
+| NB-M4b-04 | Run cards: Stripe Issuing card per run, limits (leg × 1.10, card-present, allowed categories), real-time authorization matching open stops | Test-mode authorizations: wrong merchant/amount declined; correct approved |
+| NB-M4b-05 | Receipt capture & reconciliation (photo, OCR total vs authorization, mismatch queue) | Mismatch > 10 % lands in ops queue |
+| NB-M4b-06 | Mode selection & cost model (cluster run vs DaaS legs; crew availability from dispatch tool) | Chooses cheaper feasible mode in fixture matrix |
+| NB-M4b-07 | `courier_paid_pickup_v1` template + liaison flow | Kitchen receives exact amount and courier name; ack parsed |
+| NB-M4b-08 | Ops run board (live runs, stops, card spend, receipts, reassign) | Ops can reassign a stop to DaaS fallback in ≤ 3 clicks |
+
 ## M5 · Voice & Polish
 
 | ID | Story | AC |
@@ -100,6 +118,6 @@
 
 ## Phase 2+ epics (titles)
 
-- E-201 Synchronized legs & merged tracking · E-202 POS integrations · E-203 Mobile builds (iOS/Android) · E-204 Hands-free voice on LiveKit · E-205 Group links · E-206 AI voice-call escalation · E-207 Natural-medicine content GA · E-208 Public launch ops
-- E-301 Partner courier pool & run cards · E-302 Shop extras & substitutions · E-303 Canada (FR-CA, data residency) · E-304 Calendar integrations · E-305 Rituals & reminders · E-306 Membership
+- E-201 Cluster runs at metro scale (zones, shifts, crew analytics) · E-202 Shop extras & substitutions · E-203 Synchronized DaaS legs & merged tracking · E-204 Co-located (food hall) pickups · E-205 POS integrations · E-206 Mobile builds (iOS/Android) · E-207 Hands-free voice on LiveKit · E-208 Group links · E-209 AI voice-call escalation · E-210 Natural-medicine content GA · E-211 Public launch ops
+- E-301 Canada (FR-CA, data residency) · E-302 Crew model per city · E-303 Calendar integrations · E-304 Rituals & reminders · E-305 Membership
 - E-401 Uber Consumer Delivery API · E-402 LATAM (DR) adapters · E-403 B2B · E-404 Licensed alcohol partners

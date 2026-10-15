@@ -1,0 +1,24 @@
+id: dispatch.cluster_runs
+version: 1
+description: Kitchen-cluster rule and cluster-run defaults (per-metro overrides allowed).
+cluster:
+  max_pair_distance_m: 1000
+  max_extra_minutes: 8
+  max_kitchens: 3
+  max_customer_distance_mi: 5
+  co_located_counts_as_one: true
+route:
+  max_first_hot_pickup_to_door_min: 25
+  max_run_minutes: 45
+  pickup_after_ready_by_minus_min: 3
+shop_extras:
+  max_detour_minutes_each: 6
+  max_detour_minutes_total: 12
+run_card:
+  per_authorization_multiplier: 1.10
+  card_presence: present_only
+  allowed_categories: [eating_places_restaurants, fast_food_restaurants, grocery_stores_supermarkets, bakeries, florists]
+  receipt_mismatch_review_percent: 10
+pilot:
+  hours: { daily: ["17:00-21:00"], weekend: ["11:30-14:30"] }
+  couriers_per_shift: [2, 4]

@@ -1,6 +1,6 @@
 # WF/04 · Payments & Money Flow
 
-> Status: Draft v1 · Decision: [ADR-0006](../01-architecture/adr/ADR-0006-merchant-of-record-direct-merchant-payment.md) · ⚖️ Validate MoR, tax and money-transmission questions with counsel and Stripe.
+> Status: Draft v2 (revised 2026-10-15: courier-paid pickups in Phase 1 cluster-run pilot; DoorDash `red_card` option) · Decision: [ADR-0006](../01-architecture/adr/ADR-0006-merchant-of-record-direct-merchant-payment.md) · ⚖️ Validate MoR, tax and money-transmission questions with counsel and Stripe.
 
 ## 1. Model
 
@@ -11,12 +11,12 @@ Customer ──(card/Apple Pay/Google Pay)──▶ NothingBetter (Stripe Paymen
 NothingBetter ──▶ Restaurant A (Connect settlement)        ──▶ food
 NothingBetter ──▶ Restaurant B (single-use virtual card)    ──▶ food
 NothingBetter ──▶ DaaS provider (per-delivery fee)          ──▶ delivery
-NothingBetter ──▶ Courier run card (Issuing, capped)        ──▶ shop extras / courier-paid pickups (concierge runs)
+NothingBetter ──▶ Courier run card (Issuing, capped)        ──▶ courier pays each kitchen + shop extras (cluster runs)
 NothingBetter ──▶ Own couriers (Connect payouts: run pay + 100 % tips)
 NothingBetter ──▶ Tax authorities (sales tax remitted)
 ```
 
-The founder's original idea ("pay the delivery service all the money; the courier pays each restaurant") is implemented **only** where couriers are ours or a partner's (concierge runs), via a capped card — never cash, never with DaaS couriers (they don't support it).
+The founder's idea ("pay the delivery side the money; the courier pays each restaurant along the way") is implemented in **cluster runs** (Phase 1 pilot, [WF/08](08-courier-operations.md)) with a capped Stripe Issuing run card — never cash. DaaS couriers on DoorDash Drive / Uber Direct pick up prepaid food; DoorDash's Dasher-paid `red_card` exists only in its Shop & Deliver (retail catalog) integration and must be enabled by a DoorDash account manager — we'll ask for it, and adopt it if granted.
 
 ## 2. Customer charge
 
@@ -24,7 +24,7 @@ The founder's original idea ("pay the delivery service all the money; the courie
 |---|---|
 | Food subtotal (per leg) | Menu prices as confirmed by merchants |
 | Shop extras **cap** | Authorized at cap; captured at actual |
-| Delivery fee | Pass-through of quoted provider fees (per leg) or concierge-run fee |
+| Delivery fee | Pass-through of quoted provider fees (per leg) or cluster-run fee |
 | Service fee | % of subtotal with min/max (configurable per metro) |
 | Small-order fee | Below threshold (configurable) |
 | Sales tax | Per jurisdiction, computed per leg (Stripe Tax/Avalara) |
@@ -47,7 +47,8 @@ Total shown **before** checks (estimate) and **after** checks (final); price cha
 |---|---|---|---|
 | **Connect settlement** | Partner restaurants/shops with Stripe Connect (Express) accounts | Ledger payable per leg → transfer on payout schedule (e.g., daily) | Merchant accepts our order as prepaid |
 | **Single-use virtual card** | Listed (non-partner) restaurants | Create Issuing card (amount × 1.05, food MCCs, 6 h expiry) → give card to merchant by phone/secure link or use the merchant's own online ordering checkout | At firm confirmation |
-| **Courier run card** | Concierge runs (and shop extras) | Card limit = Σ planned courier-paid amounts × 1.10; real-time auth checks | At pickup/purchase |
+| **Courier run card** | Cluster runs (kitchens + shop extras) | Per-authorization limit = planned leg amount × 1.10; card-present only; allowed categories restaurants/fast food/grocery/bakery/florist; real-time auth checks the run's open stops; receipt photo per purchase | At each counter |
+| **DoorDash `red_card`** | Only if DoorDash enables it for our account | Dasher pays; DoorDash invoices us for items; reconcile via DoorDash Reporting API | At pickup |
 | **POS-integrated prepaid** | Merchants whose POS supports third-party prepaid orders | Order injected as paid by NothingBetter; settlement via Connect | At firm confirmation |
 
 ## 5. Ledger (double-entry)

@@ -11,7 +11,7 @@
  ④ Check & hold                Availability checks to all merchants in parallel (soft hold)
  ⑤ Pay                         Customer authorizes total (+ extras cap) via Stripe
  ⑥ Firm confirm & pay merchants Each leg confirmed; merchant paid (Connect / virtual card)
- ⑦ Dispatch                    Single / synchronized legs / concierge run
+ ⑦ Dispatch                    Cluster run (own/partner courier) / single / co-located / synchronized legs
  ⑧ Pickups & extras            Per-stop status; courier buys extras with capped card
  ⑨ Delivery                    Proof of delivery; capture actual amount
  ⑩ Feedback & memory           Per-seat ratings → preferences, merchant reliability
@@ -76,7 +76,7 @@ Backups: when proposals are composed, the Logistics Planner pre-computes a **bac
 2. payMerchants: per leg payment method
      connect_settlement → ledger entry (merchant payable), transfer on payout schedule
      virtual_card       → create single-use Issuing card (amount × 1.05 cap, food MCCs, 6 h expiry) → share via secure merchant flow / ops call
-     courier_card       → (concierge run) amount added to run card limit
+     courier_card       → (cluster run) courier pays at the counter; per-authorization limit = leg amount × 1.10
 3. startDispatch: DispatchRun(child workflow) with mode & schedule
 4. track: signals from dispatch & merchants → update legs → notify user
 5. complete: delivered → capture (actual items + actual extras ≤ cap + tip) → close leg payments → feedback prompt
@@ -86,7 +86,7 @@ Backups: when proposals are composed, the Logistics Planner pre-computes a **bac
 
 For each leg: `ready_by = pickup_eta(leg) − buffer(thermal_class)`.
 
-| Thermal class | Buffer | Pickup order (concierge run) |
+| Thermal class | Buffer | Pickup order (cluster run) |
 |---|---|---|
 | Ambient (drinks, bread, flowers) | ±10 min | First |
 | Cold (salads, sushi, desserts) | 5 min | Early |
@@ -117,4 +117,4 @@ Synchronized legs (DaaS): choose per-leg dispatch times so that predicted arriva
 | Delivered + photo proof | Push |
 | Issue resolved / refund | Push + email receipt |
 
-Order tracking map: one courier path with stop icons (🍜 → 🌮 → 🛒 → 🏠) for concierge runs; for synchronized legs, multiple couriers converging with "arriving within 8 min of each other".
+Order tracking map: one courier path with stop icons (🍜 → 🌮 → 🛒 → 🏠) for cluster runs; for synchronized legs, multiple couriers converging with "arriving within 8 min of each other".

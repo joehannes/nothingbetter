@@ -34,7 +34,7 @@
 | Messaging | TCPA, FCC AI-voice ruling (2024), A2P 10DLC (US SMS), CASL (Canada), WhatsApp Business policy (opt-in, templates, escalation) | Opt-in capture with evidence; STOP/opt-out handling; quiet hours; human escalation |
 | Payments | PCI DSS 4.0 | Stripe Elements (SAQ A); Issuing card details only via Stripe Issuing Elements; no PAN storage |
 | Sales tax | Marketplace facilitator / seller rules for prepared food (state & provincial) | Stripe Tax or Avalara; tax per leg & jurisdiction |
-| Couriers | Gig-worker minimum pay laws (e.g., NYC app-based delivery workers, Seattle), classification rules (e.g., California) | v1 uses DaaS; own-fleet pool (Phase 3) designed with local counsel |
+| Couriers | Gig-worker minimum pay laws (e.g., NYC app-based delivery workers, Seattle), classification rules (e.g., California) | Cluster-run pilot uses a contracted courier company or staffing-platform shifts; own contractors only after local counsel review |
 | Alcohol / restricted goods | State/provincial licensing, ID verification | Excluded from v1 |
 | Allergens | Restaurants generally aren't required to label allergens like packaged food | Only restaurant-declared allergens shown as facts; estimates labeled "not verified"; disclaimer + "ask the kitchen" flow |
 | Accessibility | ADA (web), AODA (Ontario), WCAG 2.2 AA | See [design/05](../04-design/05-accessibility-and-i18n.md) |

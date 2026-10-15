@@ -105,7 +105,8 @@ Ops agents (not consulted by the council): **Restaurant Liaison** ([WF/02](../02
 - **Inputs:** merchant locations, prep times, live load (if known), DaaS quotes, own-fleet availability, thermal classes, travel scores, route, shops along route, weather/traffic.
 - **Skills:**
   1. Feasibility (open now, deliver by T, within zones).
-  2. Mode selection: single / synchronized legs / concierge run with fee & ETA comparison.
+  2. Kitchen-cluster check: kitchens within ~1 km of the first pickup, ≤ 8 extra minutes ([WF/03 §2](../02-workflows/03-dispatch-multi-pickup-and-shop-extras.md#2-kitchen-cluster-rule)); prefer co-located kitchens (food halls).
+  2b. Mode selection: cluster run / single / co-located / synchronized legs with cost & ETA comparison.
   3. Pickup sequencing by thermal class (ambient → cold → hot last; frozen at the end or insulated).
   4. Kitchen timing (each merchant's `ready_by`).
   5. Detour search for shop extras (route corridor, opening hours, category).

@@ -1,15 +1,15 @@
 # Plan/04 · Risks & Open Questions
 
-> Status: Draft v1
+> Status: Draft v2 (revised 2026-10-15)
 
 ## 1. Risks
 
 | # | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|---|
 | R1 | DaaS production access delayed/denied (DoorDash Drive review; Uber Direct written approval) | Med | High | Apply week 0; Nash as aggregator; keep both adapters; local courier partner as fallback |
-| R2 | No native multi-pickup single-drop at DaaS | High | Med | Synchronized legs (Phase 2); concierge runs (Phase 3); verify Nash batched jobs |
+| R2 | No multi-pickup single-drop in DaaS APIs (DoorDash Drive, Uber Direct one pickup per delivery; Nash batches need one shared pickup) | Confirmed | Med | Cluster runs with own/partner crew (Phase 1 pilot); co-located kitchens; synchronized legs as fallback; BD asks to DoorDash/Uber |
 | R3 | Restaurants slow to answer checks at rush hour | High | High | POS integrations; partner console alerts; escalation ladder; backups; reliability scoring; prefer partners |
-| R4 | Multi-leg fees make orders expensive | Med | High | Fee-aware composer; prefer single-kitchen sets when equal; concierge runs in dense zones; transparent trade-offs |
+| R4 | Multi-leg fees make orders expensive | Med | High | Kitchen-cluster rule; cluster runs at ≥ 2 runs/courier-hour; fee-aware composer; transparent trade-offs |
 | R5 | Allergen error reaching a diner | Low | Critical | Layered guardrails; verified-only for severe allergies; incident process; insurance |
 | R6 | Health-data law exposure (e.g., WA MHMDA private right of action) | Med | High | Explicit consent, minimization, geofencing review, counsel sign-off |
 | R7 | Natural-medicine claims challenged (FTC) | Med | Med | Evidence grades, banned phrases, expert review |
@@ -21,6 +21,9 @@
 | R13 | Gig-worker law compliance for own couriers | Med | High | Partner courier company first; counsel before own pool |
 | R14 | Sales-tax complexity per jurisdiction | Med | Med | Stripe Tax/Avalara; start in one state |
 | R15 | Merchant fatigue from checks that don't convert | Med | Med | Checks only on explicit intent; per-merchant throttles; conversion tracking |
+| R16 | Marketplace data collection challenged (Uber terms cover logged-out commercial use; PedidosYa terms bar extraction; bot protection) | Med (if enabled) | High | ADR-0011 default off; data from kitchens, Places/open data, licensed sources; counsel sign-off before any option C |
+| R17 | Cluster-run operations: courier no-shows, card misuse, accidents, insurance gaps | Med | High | Contracted courier partner, run-card controls + receipt audit, insurance check, DaaS fallback |
+| R18 | Stripe Issuing program approval delayed | Med | High | Apply week 0; interim: Connect settlement / single-use cards for partner kitchens, courier pays only at partner kitchens |
 
 ## 2. Open questions (owner decisions)
 
@@ -30,9 +33,11 @@
 | Q2 | Brand name: keep "NothingBetter"? Domain? | Keep as working name; check trademark and domains |
 | Q3 | Natural-medicine lens default on or off at onboarding? | Suggest on with one-line explanation; user chooses |
 | Q4 | Delivery: Nash orchestrator vs. direct DoorDash Drive + Uber Direct only | Start with Nash if commercial terms work; keep direct adapters |
-| Q5 | Courier model for concierge runs | Partner courier company first |
+| Q5 | Crew for cluster runs | Local courier company on contract for the pilot; staffing platform shifts as overflow; own contractors only after legal review |
 | Q6 | Service-fee model and membership | Model in Phase 1 beta; decide before public launch |
 | Q7 | Cheaper model for bulk menu extraction | Decide after M2 evals (Opus 5.5 at lower effort vs Haiku 5.5) |
 | Q8 | STT/TTS vendors | Decide after voice eval in M5 |
 | Q9 | Meaning of "bid from various restaurants" | Assumed: order from several restaurants in one basket. Optional later feature: "Ask the kitchens" requests where restaurants send offers (reverse bidding) |
 | Q10 | Calendar integration scope (Google/Microsoft/Apple) | Phase 3, read-only, opt-in |
+| Q11 | Marketplace data (ADR-0011): A (none), B (human research), or C (automated facts, counsel-approved) | A now; B with counsel sign-off |
+| Q12 | Kitchen-cluster radius for the pilot zone | 1.0 km / 8 extra minutes / max 3 kitchens; tune with pilot data |

@@ -172,7 +172,7 @@ Tools that spend money **do not exist** for the Host. Checkout is a user action 
 ## 7. Meal-set composition
 
 1. **Candidates:** for each seat, top-N dishes from open merchants within delivery feasibility, filtered by hard constraints (SQL), scored by `seatFit = Σ wᵢ·featureᵢ` (taste match, dish rating, novelty bonus × inspiration dial, health fit × health emphasis, cultural fit, travel score, price fit).
-2. **Combinations:** beam search over merchant sets (max merchants from ruleset/dials, usually 1–3), assigning dishes to seats; objective = Σ seatFit − λ_price·cost − λ_eta·lateness − λ_legs·extraLegs + λ_share·shareability (for group occasions).
+2. **Combinations:** beam search over merchant sets (max merchants from ruleset/dials, usually 1–3) that satisfy the kitchen-cluster rule ([WF/03 §2](../02-workflows/03-dispatch-multi-pickup-and-shop-extras.md#2-kitchen-cluster-rule)), assigning dishes to seats; objective = Σ seatFit − λ_price·cost − λ_eta·lateness − λ_legs·extraLegs + λ_share·shareability (for group occasions).
 3. **Diversity:** return 3–5 sets that differ meaningfully (one-merchant simple, best-fit, budget, adventurous).
 4. **Rerank & rationale:** one LLM call sees sets + Advice Cards and returns ordering + 1–2 sentence "why" per set and per seat, in the session's tone and language.
 5. **Validation:** deterministic re-check of hard constraints, prices, opening hours, ETA before rendering.
