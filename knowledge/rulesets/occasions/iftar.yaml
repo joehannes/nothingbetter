@@ -1,0 +1,20 @@
+id: occasion.iftar
+version: 1
+description: Meal to break the fast during Ramadan; timing anchored to local sunset.
+detect:
+  any:
+    - { regex: [ { var: brief.text }, "(?i)\\b(iftar|ramadan|ramad[aá]n|break(ing)? (the )?fast)\\b" ] }
+    - { in: [ ramadan, { var: brief.table.observancesActive } ] }   # only from self-declared observances
+timing:
+  anchor: local_sunset                 # computed from place lat/lng and date
+  arrive_before_minutes: [10, 20]
+hard_constraints:
+  - religious:halal                    # merchant-declared halal only
+structure:
+  courses: [dates_and_water, soup, shared_mains, sweets]
+  shareability_weight: 1.5
+dials_preset: { urgency: 55, inspiration: 45, directness: 50, scenic: 60 }
+tone: respectful_warm
+cautions:
+  - "Never assume observance; only from self-declared observances or explicit request."
+  - "Do not send proactive food suggestions during fasting hours unless the user opened the app."

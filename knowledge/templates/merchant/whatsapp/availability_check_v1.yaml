@@ -1,0 +1,17 @@
+name: availability_check_v1
+category: UTILITY
+languages: [en_US, es_US]
+body:
+  en_US: >
+    Hi {{1}}, this is NothingBetter. Can you prepare this pickup order by {{2}}?
+    Order {{3}}: {{4}}. Total at menu prices: {{5}}. Paid by NothingBetter before pickup.
+  es_US: >
+    Hola {{1}}, le escribe NothingBetter. ¿Pueden preparar este pedido para recoger a las {{2}}?
+    Pedido {{3}}: {{4}}. Total a precios del menú: {{5}}. NothingBetter paga antes de la recogida.
+buttons:
+  - { type: QUICK_REPLY, en_US: "✅ Yes, all good", es_US: "✅ Sí, todo bien" }
+  - { type: QUICK_REPLY, en_US: "⚠️ Changes", es_US: "⚠️ Cambios" }
+  - { type: QUICK_REPLY, en_US: "❌ Can't do it", es_US: "❌ No podemos" }
+footer:
+  en_US: "Reply HELP for a person. STOP to opt out."
+  es_US: "Responda AYUDA para hablar con una persona. STOP para darse de baja."

@@ -1,0 +1,31 @@
+version: 1
+questions:
+  - id: who_is_eating
+    text: { en: "Who's eating?", es: "¿Quiénes van a comer?" }
+    chips_from: household_avatars
+    multi: true
+    maps_to: table.seats
+  - id: hunger_level
+    text: { en: "How hungry?", es: "¿Cuánta hambre?" }
+    chips: [ { id: small, en: "Just a bite", es: "Algo ligero" }, { id: normal, en: "Normal", es: "Normal" }, { id: very, en: "Very hungry", es: "Mucha hambre" } ]
+    maps_to: portion_weight
+  - id: direction
+    text: { en: "What sounds right?", es: "¿Qué se te antoja?" }
+    chips: [ { id: comfort, en: "Comforting", es: "Reconfortante" }, { id: light, en: "Light & fresh", es: "Ligero y fresco" }, { id: exciting, en: "Something exciting", es: "Algo emocionante" }, { id: specific, en: "I'm craving something", es: "Tengo un antojo" }, { id: no_idea, en: "No idea", es: "Ni idea" } ]
+    maps_to: flavor_direction
+  - id: spice
+    text: { en: "Spicy or mild?", es: "¿Picante o suave?" }
+    chips: [ { id: mild, en: "Mild", es: "Suave" }, { id: medium, en: "Some heat", es: "Un poco" }, { id: hot, en: "Bring it", es: "¡Picante!" } ]
+    maps_to: spice_target
+  - id: mix_kitchens
+    text: { en: "One kitchen for everyone, or mix and match?", es: "¿Un solo restaurante o combinamos?" }
+    chips: [ { id: one, en: "One kitchen", es: "Uno solo" }, { id: mix, en: "Mix and match", es: "Combinar" } ]
+    maps_to: constraints.max_merchants
+  - id: budget
+    text: { en: "Budget around…?", es: "¿Presupuesto aproximado?" }
+    chips_from: budget_suggestions
+    maps_to: constraints.budget
+  - id: avoid
+    text: { en: "Anything to avoid tonight?", es: "¿Algo que evitar hoy?" }
+    free_text: true
+    maps_to: situational.avoid

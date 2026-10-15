@@ -1,0 +1,25 @@
+code: ingredient:ginger
+type: ingredient
+status: seed_draft            # requires review:health before production
+labels: { en: Ginger, es: Jengibre, fr: Gingembre }
+traditional:
+  tcm: { nature: warming, flavor: [pungent], uses: ["dispels cold", "settles the stomach"] }
+  ayurveda: { rasa: [katu], virya: ushna, dosha: { vata: decreases, kapha: decreases, pitta: may_increase_in_excess } }
+  folk: ["ginger tea for colds", "ginger for travel sickness"]
+evidence:
+  - claim: "May reduce nausea (pregnancy, post-operative, motion)"
+    level: B
+    source: src:nccih_ginger
+interactions:
+  - with: anticoagulants
+    severity: caution
+    note: "High supplemental doses may increase bleeding risk; culinary amounts generally considered safe."
+    source: src:msk_about_herbs_ginger
+phrasing:
+  en: "Ginger has a long tradition for settling the stomach, and studies suggest a modest effect on nausea."
+  es: "El jengibre se usa tradicionalmente para asentar el estómago, y los estudios sugieren un efecto modesto sobre las náuseas."
+sources:
+  - { id: src:nccih_ginger, title: "NCCIH — Ginger", url: "https://www.nccih.nih.gov/health/ginger", license: "US Government work" }
+  - { id: src:msk_about_herbs_ginger, title: "MSK About Herbs — Ginger", url: "https://www.mskcc.org/cancer-care/integrative-medicine/herbs/ginger", license: "Check terms (reference only)" }
+review: { reviewer_role: licensed_naturopath_and_RD, reviewed_at: null, next_review: null }
+version: 1

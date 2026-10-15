@@ -1,0 +1,18 @@
+id: situation.family_weeknight
+version: 1
+description: Weeknight dinner at home with the household, including children.
+when:
+  all:
+    - { in: [ { var: brief.slot }, [dinner] ] }
+    - { "==": [ { var: brief.dayType }, workday ] }
+    - { ">=": [ { var: brief.table.size }, 2 ] }
+    - { "==": [ { var: brief.table.hasMinor }, true ] }
+effects:
+  dials_preset: { urgency: 60, inspiration: 30, directness: 60, scenic: 30 }
+  faculties:
+    enable: [safety, context, palate, social, value, logistics, nutrition]
+  constraints:
+    max_merchants: 2
+  weights: { proven_favorite: 1.3, kid_friendly: 1.4, shareability: 1.1, price: 1.1 }
+  ui: { lane: guided, max_options: 3, show_table_view: true }
+priority: 40

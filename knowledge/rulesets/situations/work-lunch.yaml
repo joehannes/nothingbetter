@@ -1,0 +1,19 @@
+id: situation.work_lunch
+version: 1
+description: Weekday lunch with limited time before the next calendar event.
+when:
+  all:
+    - { in: [ { var: brief.slot }, [lunch] ] }
+    - { "==": [ { var: brief.dayType }, workday ] }
+    - { "<=": [ { var: brief.minutesToNextEvent }, 60 ] }
+effects:
+  dials_preset: { urgency: 75, inspiration: 15, directness: 85, scenic: 10 }
+  faculties:
+    enable: [safety, context, palate, logistics, value]
+    disable: [inspiration, occasion]
+  constraints:
+    max_merchants: 1
+    deliver_by: "brief.nextEventAt - 15m"
+  weights: { eta: 1.5, price: 1.2, novelty: 0.3, travel_quality: 1.2 }
+  ui: { lane: express, max_options: 3, max_questions: 1 }
+priority: 50

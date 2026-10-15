@@ -1,0 +1,24 @@
+# Occasion date RULES. A yearly job computes concrete dates into knowledge.occasion_calendar.
+# Lunar/religious dates must be computed with calendar libraries and verified each year
+# (some depend on moon sighting or community practice). Do not hard-code them here.
+version: 1
+occasions:
+  - { code: occasion:thanksgiving_us, region: US, rule: "fourth Thursday of November", foods: [dish:roast_turkey, dish:stuffing, dish:cranberry_sauce, dish:pumpkin_pie] }
+  - { code: occasion:thanksgiving_ca, region: CA, rule: "second Monday of October", foods: [dish:roast_turkey, dish:pumpkin_pie] }
+  - { code: occasion:july_4, region: US, rule: "July 4", foods: [dish:bbq_ribs, dish:burgers, dish:corn_on_the_cob] }
+  - { code: occasion:canada_day, region: CA, rule: "July 1", foods: [dish:poutine, dish:butter_tarts] }
+  - { code: occasion:juneteenth, region: US, rule: "June 19", foods: [dish:bbq, dish:red_velvet_cake, dish:strawberry_soda] }
+  - { code: occasion:super_bowl, region: US, rule: "NFL schedule (fetch yearly)", foods: [dish:wings, dish:nachos, dish:sliders] }
+  - { code: occasion:nochebuena, region: US-FL, rule: "December 24 (evening)", foods: [dish:lechon_asado, dish:moros_y_cristianos] }
+  - { code: occasion:dia_de_muertos, region: US, rule: "November 1–2", foods: [dish:pan_de_muerto, dish:tamales, dish:mole] }
+  - { code: occasion:lunar_new_year, region: NA, rule: "Chinese lunisolar calendar (compute)", foods: [dish:dumplings, dish:longevity_noodles, dish:whole_fish] }
+  - { code: occasion:ramadan, region: NA, rule: "Islamic calendar month 9 (compute + community verification)", daily_timing: { iftar: local_sunset, suhoor: before_dawn } }
+  - { code: occasion:eid_al_fitr, region: NA, rule: "1 Shawwal (compute + verify)" }
+  - { code: occasion:diwali, region: NA, rule: "Hindu lunisolar calendar (compute + verify)", foods: [dish:samosa, dish:gulab_jamun, dish:barfi] }
+  - { code: occasion:passover, region: NA, rule: "15 Nisan (Hebrew calendar via Hebcal)", notes: "kosher-for-Passover rules if self-declared" }
+  - { code: occasion:hanukkah, region: NA, rule: "25 Kislev (Hebrew calendar via Hebcal)", foods: [dish:latkes, dish:sufganiyot] }
+  - { code: occasion:shabbat, region: NA, rule: "weekly, Friday sundown to Saturday nightfall", daily_timing: { start: local_sunset_friday } }
+  - { code: occasion:lent_fridays, region: NA, rule: "Fridays between Ash Wednesday and Easter (computus)" }
+  - { code: occasion:nowruz, region: NA, rule: "March equinox (astronomical)", foods: [dish:sabzi_polo_mahi] }
+  - { code: occasion:mothers_day, region: [US, CA], rule: "second Sunday of May" }
+  - { code: occasion:fathers_day, region: [US, CA], rule: "third Sunday of June" }

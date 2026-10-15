@@ -1,0 +1,47 @@
+version: 1
+decay_half_life_turns: 3
+max_model_nudge_per_turn: 15
+lane_hysteresis: 8
+signals:
+  - id: meeting_soon
+    when: { "<=": [ { var: brief.minutesToNextEvent }, 45 ] }
+    delta: { urgency: 25 }
+  - id: workday_desk_lunch
+    when: { all: [ { "==": [ { var: brief.slot }, lunch ] }, { "==": [ { var: brief.device }, desktop ] }, { "==": [ { var: brief.dayType }, workday ] } ] }
+    delta: { urgency: 10, directness: 15, scenic: -15 }
+  - id: words_hurry
+    when: { regex: [ { var: turn.text }, "(?i)\\b(quick|asap|starving|hurry|just|r[aá]pido|ya)\\b" ] }
+    delta: { urgency: 20, directness: 10 }
+  - id: words_celebrate
+    when: { regex: [ { var: turn.text }, "(?i)\\b(special|celebrat|anniversar|birthday|surprise|cumplea|fiesta)\\w*" ] }
+    delta: { scenic: 30, inspiration: 20, urgency: -10 }
+  - id: words_novelty
+    when: { regex: [ { var: turn.text }, "(?i)(something new|bored of|surprise me|algo nuevo|sorpr[eé]ndeme)" ] }
+    delta: { inspiration: 30 }
+  - id: words_unwell
+    when: { regex: [ { var: turn.text }, "(?i)\\b(sick|tired|rough day|exhausted|enfermo|cansad)\\w*" ] }
+    delta: { directness: 10, scenic: -10, health_emphasis: 25 }
+  - id: terse_replies
+    when: { "<": [ { var: turn.wordCount }, 4 ] }
+    delta: { urgency: 5, directness: 5 }
+    cap_per_session: { urgency: 15 }
+  - id: long_messages
+    when: { ">": [ { var: turn.wordCount }, 30 ] }
+    delta: { scenic: 5, directness: -5 }
+  - id: fast_speech
+    when: { ">": [ { var: turn.voice.rateVsBaseline }, 1.2 ] }
+    delta: { urgency: 10 }
+  - id: budget_mentioned
+    when: { regex: [ { var: turn.text }, "(?i)(\\$\\s?\\d+|under \\d+|cheap|budget|barato|presupuesto)" ] }
+    delta: { budget_sensitivity: 30 }
+  - id: late_night
+    when: { ">=": [ { var: brief.localHour }, 22 ] }
+    delta: { directness: 10, scenic: -10 }
+  - id: weekend_group_evening
+    when: { all: [ { "==": [ { var: brief.dayType }, weekend ] }, { in: [ { var: brief.slot }, [dinner] ] }, { ">=": [ { var: brief.table.size }, 2 ] } ] }
+    delta: { scenic: 10 }
+overrides:
+  just_get_me_food:     { urgency: 90, inspiration: 10, directness: 90, scenic: 5 }
+  take_me_on_a_journey: { urgency: 20, inspiration: 70, directness: 30, scenic: 90 }
+  inspire_me:           { inspiration: 90, scenic: 70 }
+  keep_it_healthy:      { health_emphasis: 85 }

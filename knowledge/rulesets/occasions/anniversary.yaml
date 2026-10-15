@@ -1,0 +1,17 @@
+id: occasion.anniversary
+version: 1
+detect:
+  any:
+    - { regex: [ { var: brief.text }, "(?i)anniversar|aniversario|anniversaire" ] }
+    - { "==": [ { var: brief.calendar.tag }, anniversary ] }
+dials_preset: { urgency: 25, inspiration: 75, directness: 30, scenic: 85 }
+structure:
+  courses: [starter_or_share, main_per_seat, dessert_shared]
+  max_merchants: 3
+  schedule: { prefer_window_minutes: 15 }
+extras:
+  suggest: [flowers, candles, dessert_from_specialist, non_alcoholic_sparkling]
+  exclude_v1: [alcohol]
+tone: warm_evocative
+questions_first: [recreate_or_new, cuisine_memory]
+copy_keys: [occasion.anniversary.opening, occasion.anniversary.summary]

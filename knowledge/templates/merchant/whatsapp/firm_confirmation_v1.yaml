@@ -1,0 +1,18 @@
+name: firm_confirmation_v1
+category: UTILITY
+languages: [en_US, es_US]
+body:
+  en_US: >
+    Confirmed ✅ Order {{1}} — {{2}}. Please have it ready by {{3}} for courier pickup ({{4}}).
+    {{5}}
+    Payment: {{6}}
+  es_US: >
+    Confirmado ✅ Pedido {{1}} — {{2}}. Por favor, téngalo listo a las {{3}} para el repartidor ({{4}}).
+    {{5}}
+    Pago: {{6}}
+variables:
+  "5": "Allergy line, e.g. '⚠️ SEVERE SESAME ALLERGY: kids pasta — no sesame, clean utensils.' or empty"
+  "6": "'Paid via NothingBetter account' | 'Card call from NothingBetter within 5 min'"
+buttons:
+  - { type: QUICK_REPLY, en_US: "👍 Got it", es_US: "👍 Recibido" }
+  - { type: QUICK_REPLY, en_US: "Problem", es_US: "Problema" }
